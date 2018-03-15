@@ -32,9 +32,20 @@ namespace NSwag.SwaggerGeneration.WebApi.Infrastructure
             Attribute = attr;
         }
 
+        public bool IsOData { get; set; }
+
         public Attribute Attribute { get; }
 
-        public string Prefix => (string)_prefix.GetValue(Attribute);
+        public string Prefix
+        {
+            get
+            {
+                if (IsOData)
+                    return $"api/{_prefix.GetValue(Attribute)}";
+                else
+                    return (string)_prefix.GetValue(Attribute);
+            }
+        }
 
         public static RoutePrefixAttributeFacade TryMake(Attribute a)
         {
@@ -45,8 +56,14 @@ namespace NSwag.SwaggerGeneration.WebApi.Infrastructure
             {
                 return new RoutePrefixAttributeFacade(a);
             }
+            else if (type.Name == "ODataRoutePrefixAttribute")
+            {
+                return new RoutePrefixAttributeFacade(a) { IsOData = true };
+            }
 
             return null;
         }
     }
+
+
 }

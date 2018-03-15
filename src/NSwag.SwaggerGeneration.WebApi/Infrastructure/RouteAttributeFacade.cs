@@ -56,6 +56,12 @@ namespace NSwag.SwaggerGeneration.WebApi.Infrastructure
                 if (template != null)
                     return new RouteAttributeFacade(a, template);
             }
+            else if (type.Name == "ODataRouteAttribute") //OData
+            {
+                var template = type.GetRuntimeProperty("PathTemplate");
+                if (template != null)
+                    return new RouteAttributeFacade(a, template);
+            }
 
             return null;
         }

@@ -46,19 +46,24 @@ namespace NSwag.SwaggerGeneration.WebApi
         public static IEnumerable<Type> GetControllerClasses(Assembly assembly)
         {
             // TODO: Move to IControllerClassLoader interface
-            return assembly.ExportedTypes
+            var types = assembly.ExportedTypes
                 .Where(t => t.GetTypeInfo().IsAbstract == false)
                 .Where(t => t.Name.EndsWith("Controller") ||
                             t.InheritsFrom("ApiController", TypeNameStyle.Name) ||
+                            t.InheritsFrom("ODataController", TypeNameStyle.Name) ||
                             t.InheritsFrom("ControllerBase", TypeNameStyle.Name)) // in ASP.NET Core, a Web API controller inherits from Controller
-                .Where(t => t.GetTypeInfo().ImplementedInterfaces.All(i => i.FullName != "System.Web.Mvc.IController")) // no MVC controllers (legacy ASP.NET)
-                .Where(t =>
-                {
-                    return t.GetTypeInfo().GetCustomAttributes()
-                        .SingleOrDefault(a => a.GetType().Name == "ApiExplorerSettingsAttribute")?
-                        .TryGetPropertyValue("IgnoreApi", false) != true;
+                .Where(t => t.GetTypeInfo().ImplementedInterfaces.All(i => i.FullName != "System.Web.Mvc.IController")); // no MVC controllers (legacy ASP.NET)
+                //.Where(t =>
+                //{
+                //    return t.GetTypeInfo().GetCustomAttributes()
+                //        .SingleOrDefault(a => a.GetType().Name == "ApiExplorerSettingsAttribute")?
+                //        .TryGetPropertyValue("IgnoreApi", false) != true;
 
-                });
+                //});
+
+            var test = types.ToList();
+
+            return types;
         }
 
         /// <summary>Gets or sets the generator settings.</summary>
@@ -122,6 +127,7 @@ namespace NSwag.SwaggerGeneration.WebApi
         /// <exception cref="InvalidOperationException">The operation has more than one body parameter.</exception>
         private async Task GenerateForControllerAsync(SwaggerDocument document, Type controllerType, SwaggerGenerator swaggerGenerator, SwaggerSchemaResolver schemaResolver)
         {
+           // System.Console.WriteLine($"Controller: {controllerType}");
             var hasIgnoreAttribute = controllerType.GetTypeInfo()
                 .GetCustomAttributes()
                 .Any(a => a.GetType().Name == "SwaggerIgnoreAttribute");

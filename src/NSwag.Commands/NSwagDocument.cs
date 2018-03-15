@@ -271,7 +271,14 @@ namespace NSwag.Commands
 
 	        var runtime = Runtime != Runtime.Default ? Runtime : RuntimeUtilities.CurrentRuntime;
             if (runtime == Runtime.WinX64)
-                return System.IO.Path.Combine(RootBinaryDirectory, "Win/nswag.exe");
+            {
+#if DEBUG
+                return System.IO.Path.Combine(@"C:\endpointDev\NSwag\src\NSwag.Console\bin\Debug\net461", "nswag.exe");
+#else
+                  return System.IO.Path.Combine(RootBinaryDirectory, "Win/nswag.exe");
+#endif
+
+            }
             else if (runtime == Runtime.WinX86)
                 return System.IO.Path.Combine(RootBinaryDirectory, "Win/nswag.x86.exe");
             else
